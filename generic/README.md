@@ -33,6 +33,23 @@ go run .
 
 The client passes `client.WithURL("tri://127.0.0.1:50052")` to `cli.NewGenericService(...)` for a per-service direct connection and performs generic calls through that generic service.
 
+## Generic mode runtime checks
+
+The Go client uses `client.WithGenericType(...)` to select the generic format. This is independent from `client.WithSerialization(...)`, which selects the transport encoding on the wire.
+
+| Generic mode | Meaning | Runtime sample coverage |
+|--------------|---------|-------------------------|
+| `true` | Map-based generic result (default) | Complete `User` check, including `Time` |
+| `gson` | JSON generic result | JSON shape check with an accepted Map fallback |
+| `bean` | JavaBean descriptor result | Typed DTO check for `ID`, `Name`, and `Age` |
+| `protobuf-json` | Protobuf JSON result | Not used by the current Hessian POJO service |
+| `protobuf` | Legacy compatibility alias | Preserved for compatibility |
+| `false` or empty | Disable generic invocation | No generic call is made |
+
+When a `gson` result is a JSON string, it must decode to a complete `User` (`ID`, `Name`, `Age`, and `Time`). A Hessian Map fallback from either provider is accepted with an explicit warning. The `true` mode also checks every observable `User` field, including `Time`.
+
+The Bean generalizer represents exported bean properties but cannot round-trip the unexported state inside Go's `time.Time`. The `bean` mode therefore uses an explicit DTO containing the supported `ID`, `Name`, and `Age` fields instead of accepting a partially populated `User`. The client also confirms that an unknown mode is rejected. These are runtime sample checks rather than `go test` unit tests. The current `User` service is a Hessian POJO rather than a `proto.Message`, so `protobuf-json` is not included in this flow.
+
 ## Run the Java Server
 
 Build and run from the java-server directory:
@@ -89,3 +106,4 @@ All generic call tests completed
 - Neither the Go server nor the Java server requires ZooKeeper; both listen directly on their configured ports.
 - The Java client uses direct connection via `tri://127.0.0.1:50052` (`reference.setUrl(...)`).
 - The Go client uses direct connection via `tri://127.0.0.1:50052`.
+- Unknown generic modes fail during service creation instead of silently falling back to Map.
