@@ -48,6 +48,21 @@ const (
 	quicMaxConnectionReceiveWindow     = 8 * 1024 * 1024
 )
 
+// http3Options returns the HTTP/3 options applied by this sample.
+func http3Options() []triple.Option {
+	return []triple.Option{
+		triple.WithHttp3Enable(),
+		triple.WithHttp3KeepAlivePeriod(quicKeepAlivePeriod),
+		triple.WithHttp3MaxIdleTimeout(quicMaxIdleTimeout),
+		triple.WithHttp3MaxIncomingStreams(quicMaxIncomingStreams),
+		triple.WithHttp3MaxIncomingUniStreams(quicMaxIncomingUniStreams),
+		triple.WithHttp3InitialStreamReceiveWindow(quicInitialStreamReceiveWindow),
+		triple.WithHttp3MaxStreamReceiveWindow(quicMaxStreamReceiveWindow),
+		triple.WithHttp3InitialConnectionReceiveWindow(quicInitialConnectionReceiveWindow),
+		triple.WithHttp3MaxConnectionReceiveWindow(quicMaxConnectionReceiveWindow),
+	}
+}
+
 type GreetTripleServer struct {
 }
 
@@ -63,15 +78,7 @@ func main() {
 		server.WithServerProtocol(
 			protocol.WithPort(20000),
 			protocol.WithTriple(
-				triple.WithHttp3Enable(),
-				triple.WithHttp3KeepAlivePeriod(quicKeepAlivePeriod),
-				triple.WithHttp3MaxIdleTimeout(quicMaxIdleTimeout),
-				triple.WithHttp3MaxIncomingStreams(quicMaxIncomingStreams),
-				triple.WithHttp3MaxIncomingUniStreams(quicMaxIncomingUniStreams),
-				triple.WithHttp3InitialStreamReceiveWindow(quicInitialStreamReceiveWindow),
-				triple.WithHttp3MaxStreamReceiveWindow(quicMaxStreamReceiveWindow),
-				triple.WithHttp3InitialConnectionReceiveWindow(quicInitialConnectionReceiveWindow),
-				triple.WithHttp3MaxConnectionReceiveWindow(quicMaxConnectionReceiveWindow),
+				http3Options()...,
 			),
 		),
 		server.WithServerTLSOption(
