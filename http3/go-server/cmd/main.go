@@ -36,6 +36,18 @@ import (
 	greet "github.com/apache/dubbo-go-samples/http3/proto"
 )
 
+// QUIC transport tuning values; unset options fall back to quic-go defaults.
+const (
+	quicKeepAlivePeriod                = 30 * time.Second
+	quicMaxIdleTimeout                 = 90 * time.Second
+	quicMaxIncomingStreams             = 1024
+	quicMaxIncomingUniStreams          = 1024
+	quicInitialStreamReceiveWindow     = 512 * 1024
+	quicMaxStreamReceiveWindow         = 2 * 1024 * 1024
+	quicInitialConnectionReceiveWindow = 2 * 1024 * 1024
+	quicMaxConnectionReceiveWindow     = 8 * 1024 * 1024
+)
+
 type GreetTripleServer struct {
 }
 
@@ -52,15 +64,14 @@ func main() {
 			protocol.WithPort(20000),
 			protocol.WithTriple(
 				triple.WithHttp3Enable(),
-				// QUIC transport tuning; unset options fall back to quic-go defaults.
-				triple.WithHttp3KeepAlivePeriod(30*time.Second),
-				triple.WithHttp3MaxIdleTimeout(90*time.Second),
-				triple.WithHttp3MaxIncomingStreams(1024),
-				triple.WithHttp3MaxIncomingUniStreams(1024),
-				triple.WithHttp3InitialStreamReceiveWindow(512*1024),
-				triple.WithHttp3MaxStreamReceiveWindow(2*1024*1024),
-				triple.WithHttp3InitialConnectionReceiveWindow(2*1024*1024),
-				triple.WithHttp3MaxConnectionReceiveWindow(8*1024*1024),
+				triple.WithHttp3KeepAlivePeriod(quicKeepAlivePeriod),
+				triple.WithHttp3MaxIdleTimeout(quicMaxIdleTimeout),
+				triple.WithHttp3MaxIncomingStreams(quicMaxIncomingStreams),
+				triple.WithHttp3MaxIncomingUniStreams(quicMaxIncomingUniStreams),
+				triple.WithHttp3InitialStreamReceiveWindow(quicInitialStreamReceiveWindow),
+				triple.WithHttp3MaxStreamReceiveWindow(quicMaxStreamReceiveWindow),
+				triple.WithHttp3InitialConnectionReceiveWindow(quicInitialConnectionReceiveWindow),
+				triple.WithHttp3MaxConnectionReceiveWindow(quicMaxConnectionReceiveWindow),
 			),
 		),
 		server.WithServerTLSOption(
