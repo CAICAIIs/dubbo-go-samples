@@ -136,6 +136,18 @@ The services are configured with HTTP/3 support. Key configuration parameters:
 - `protocol.triple.http3.negotiation=false` - Disables protocol negotiation (forces HTTP/3)
 - TLS certificates are configured for secure QUIC connections
 
+### QUIC Transport Tuning
+
+Both Go server and client apply QUIC transport options through `triple.WithHttp3*` code options:
+
+- `WithHttp3KeepAlivePeriod(30 * time.Second)` - Sends QUIC keep-alive packets every 30s
+- `WithHttp3MaxIdleTimeout(90 * time.Second)` - Closes idle QUIC connections after 90s
+- `WithHttp3MaxIncomingStreams(1024)` / `WithHttp3MaxIncomingUniStreams(1024)` - Concurrent bidirectional/unidirectional stream limits
+- `WithHttp3InitialStreamReceiveWindow(512 * 1024)` / `WithHttp3MaxStreamReceiveWindow(2 * 1024 * 1024)` - Stream-level flow control receive windows
+- `WithHttp3InitialConnectionReceiveWindow(2 * 1024 * 1024)` / `WithHttp3MaxConnectionReceiveWindow(8 * 1024 * 1024)` - Connection-level flow control receive windows
+
+All options are optional; unset values fall back to quic-go defaults.
+
 ### Certificate Files
 
 The x509 directory contains the following certificate files:

@@ -52,7 +52,16 @@ func main() {
 		// both HTTP/2 and HTTP/3 with Alt-Svc negotiation
 		client.WithClientProtocol(
 			protocol.WithTriple(
-				triple.Http3Enable(),
+				triple.WithHttp3Enable(),
+				// QUIC transport tuning; unset options fall back to quic-go defaults.
+				triple.WithHttp3KeepAlivePeriod(30*time.Second),
+				triple.WithHttp3MaxIdleTimeout(90*time.Second),
+				triple.WithHttp3MaxIncomingStreams(1024),
+				triple.WithHttp3MaxIncomingUniStreams(1024),
+				triple.WithHttp3InitialStreamReceiveWindow(512*1024),
+				triple.WithHttp3MaxStreamReceiveWindow(2*1024*1024),
+				triple.WithHttp3InitialConnectionReceiveWindow(2*1024*1024),
+				triple.WithHttp3MaxConnectionReceiveWindow(8*1024*1024),
 			),
 		),
 	)

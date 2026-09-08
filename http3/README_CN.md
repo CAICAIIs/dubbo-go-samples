@@ -136,6 +136,18 @@ cd java-client
 - `protocol.triple.http3.negotiation=false` - 禁用协议协商（强制使用 HTTP/3）
 - TLS 证书配置用于安全的 QUIC 连接
 
+### QUIC 传输调优
+
+Go 服务端和客户端均通过 `triple.WithHttp3*` 代码选项配置 QUIC 传输参数：
+
+- `WithHttp3KeepAlivePeriod(30 * time.Second)` - 每 30s 发送一次 QUIC keep-alive 包
+- `WithHttp3MaxIdleTimeout(90 * time.Second)` - 空闲 QUIC 连接 90s 后关闭
+- `WithHttp3MaxIncomingStreams(1024)` / `WithHttp3MaxIncomingUniStreams(1024)` - 并发双向/单向流数量上限
+- `WithHttp3InitialStreamReceiveWindow(512 * 1024)` / `WithHttp3MaxStreamReceiveWindow(2 * 1024 * 1024)` - Stream 级流控接收窗口
+- `WithHttp3InitialConnectionReceiveWindow(2 * 1024 * 1024)` / `WithHttp3MaxConnectionReceiveWindow(8 * 1024 * 1024)` - Connection 级流控接收窗口
+
+所有选项均可选，未设置时回退到 quic-go 默认值。
+
 ### 证书文件
 
 x509 目录包含以下证书文件：
