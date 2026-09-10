@@ -26,42 +26,15 @@ import (
 	"dubbo.apache.org/dubbo-go/v3/client"
 	_ "dubbo.apache.org/dubbo-go/v3/imports"
 	"dubbo.apache.org/dubbo-go/v3/protocol"
-	"dubbo.apache.org/dubbo-go/v3/protocol/triple"
 	"dubbo.apache.org/dubbo-go/v3/tls"
 
 	"github.com/dubbogo/gost/log/logger"
 )
 
 import (
+	quic "github.com/apache/dubbo-go-samples/http3/internal/quic"
 	greet "github.com/apache/dubbo-go-samples/http3/proto"
 )
-
-// QUIC transport tuning values; unset options fall back to quic-go defaults.
-const (
-	quicKeepAlivePeriod                = 30 * time.Second
-	quicMaxIdleTimeout                 = 90 * time.Second
-	quicMaxIncomingStreams             = 1024
-	quicMaxIncomingUniStreams          = 1024
-	quicInitialStreamReceiveWindow     = 512 * 1024
-	quicMaxStreamReceiveWindow         = 2 * 1024 * 1024
-	quicInitialConnectionReceiveWindow = 2 * 1024 * 1024
-	quicMaxConnectionReceiveWindow     = 8 * 1024 * 1024
-)
-
-// http3Options returns the HTTP/3 options applied by this sample.
-func http3Options() []triple.Option {
-	return []triple.Option{
-		triple.WithHttp3Enable(),
-		triple.WithHttp3KeepAlivePeriod(quicKeepAlivePeriod),
-		triple.WithHttp3MaxIdleTimeout(quicMaxIdleTimeout),
-		triple.WithHttp3MaxIncomingStreams(quicMaxIncomingStreams),
-		triple.WithHttp3MaxIncomingUniStreams(quicMaxIncomingUniStreams),
-		triple.WithHttp3InitialStreamReceiveWindow(quicInitialStreamReceiveWindow),
-		triple.WithHttp3MaxStreamReceiveWindow(quicMaxStreamReceiveWindow),
-		triple.WithHttp3InitialConnectionReceiveWindow(quicInitialConnectionReceiveWindow),
-		triple.WithHttp3MaxConnectionReceiveWindow(quicMaxConnectionReceiveWindow),
-	}
-}
 
 func main() {
 	logger.SetLoggerLevel("debug")
@@ -79,7 +52,7 @@ func main() {
 		// both HTTP/2 and HTTP/3 with Alt-Svc negotiation
 		client.WithClientProtocol(
 			protocol.WithTriple(
-				http3Options()...,
+				quic.Options()...,
 			),
 		),
 	)
